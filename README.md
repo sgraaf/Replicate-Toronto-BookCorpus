@@ -36,11 +36,11 @@ After downloading the plaintext books, they need to be pre-processed in order to
 python src/preprocess_books.py
 ```
 
-### Acknowledgement
+## Acknowledgement
 This project builds upon [bookcorpus](https://github.com/soskek/bookcorpus).
 
-### Disclaimer
+## Disclaimer
 Please read the Smashwords [Terms of Service](https://www.smashwords.com/about/tos) carefully. Furthermore, please use the code in this repository responsibly and adhere to any copyright (and related) laws. I am not responsible for any copyright / plagiarism / legal issues that may arise from using the code in this repository.
 
-### License
+## License
 Replicate Toronto BookCorpus is open-source and licensed under GNU GPL, Version 3.
