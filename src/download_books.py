@@ -16,7 +16,7 @@ NB_RETRIES = 3
 
 def main():
     # create dirs
-    root_dir = Path(__file__).resolve().parent
+    root_dir = Path(__file__).resolve().parents[1]
     data_dir = root_dir / 'data'
     dump_dir = root_dir / 'dump'
     mkdirs(data_dir, dump_dir)
@@ -25,7 +25,7 @@ def main():
     book_download_urls = read(root_dir / 'book_download_urls.txt').splitlines()
 
     # remove any books that have already been downloaded
-    book_download_urls = [url for url in book_download_urls if not (root_dir / 'data' / f'{get_book_id(url)}.txt').exists()]
+    book_download_urls = [url for url in book_download_urls if not (data_dir / f'{get_book_id(url)}.txt').exists()]
 
     if book_download_urls:
         # keep only the first 500 (as smashwords blocks the IP-address after 500 requests)
@@ -64,7 +64,7 @@ def main():
                             book_r.encoding = 'utf-8'
 
                             # write the content to disk
-                            write(book_r.text, data_dir / f'{get_book_id(book_url)}.txt')
+                            write(book_r.content, data_dir / f'{get_book_id(book_url)}.txt')
                         else:
                             failed_book_download_urls.append(book_url)
                             print(f'Request failed for {book_url}: status code [{book_r.status_code}]')

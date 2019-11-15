@@ -8,6 +8,7 @@ import unicodedata
 from pathlib import Path
 from typing import Dict, List
 
+from blingfire import text_to_sentences
 import requests
 from requests import (ConnectionError, RequestException, Response, Session,
                       Timeout)
@@ -15,6 +16,19 @@ from requests import (ConnectionError, RequestException, Response, Session,
 ALLOWED_SUFFIXES = {'.json', '.pkl'}
 SUCCESS_SLEEP = 0.5
 RETRY_SLEEP = 1.0
+
+
+def bytes2text(bytes_str: str) -> str:
+    try:
+        return bytes_str.decode('utf-8-sig')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        try:
+            return bytes_str.decode('ascii')
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            try:
+                return bytes_str.decode('ISO-8859-1')
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                return ''
 
 
 def dump(obj: object, name: str, dump_dir: Path = Path(__file__).resolve().parent / 'dump') -> None:
@@ -83,13 +97,17 @@ def mkdirs(*args: Path) -> None:
         dir.mkdir(parents=True, exist_ok=True)
 
 
-def read(file: Path) -> str:
+def read(file: Path, mode: str = 'rb', encoding: str = 'utf-8') -> str:
     # check if file exists
     if not file.exists():
         print(f'File does not exist: {file}')
 
-    with open(file, 'r') as f:
-        return f.read()
+    if 'b' in mode:
+        with open(file, mode=mode) as f:
+            return f.read()
+    else:
+        with open(file, mode=mode, encoding=encoding) as f:
+            return f.read()
 
 
 def sanitize_file(file: str) -> str:
@@ -99,10 +117,29 @@ def sanitize_file(file: str) -> str:
     return re.sub(r'[-\s]+', '-', file)
 
 
-def write(text: str, file: Path) -> None:
+def text2sentences(text: str) -> str:
+    lines = [line.strip() for line in text.splitlines()]
+    stack = []
+    sentences = []
+
+    for line in lines:
+        if line:
+            stack.append(line)
+        elif stack:  # empty line and non-empty stack
+                sentences += text_to_sentences(' '.join(stack).strip()).splitlines()
+                stack = []
+
+    return '\n'.join(sentences)
+
+
+def write(text: str, file: Path, mode: str = 'wb', encoding: str = 'utf-8') -> None:
     # check if file exists
     if file.exists():
         print(f'File already exists: {file}')
-
-    with open(file, 'w') as f:
-        f.write(text)
+    
+    if 'b' in mode:
+        with open(file, mode=mode) as f:
+            f.write(text)
+    else:
+        with open(file, mode=mode, encoding=encoding) as f:
+            f.write(text)

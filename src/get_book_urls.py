@@ -18,7 +18,7 @@ NB_RETRIES = 3
 
 def main():
     # create dirs
-    root_dir = Path(__file__).resolve().parent
+    root_dir = Path(__file__).resolve().parents[1]
     dump_dir = root_dir / 'dump'
     mkdirs(dump_dir)
 
