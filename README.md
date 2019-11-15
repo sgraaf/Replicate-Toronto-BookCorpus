@@ -4,6 +4,7 @@ This repository contains code to replicate the no-longer-available Toronto BookC
 
 ## Requirements
 - python 3.6+
+- blingfire
 - cachecontrol
 - lxml
 - requests
@@ -13,7 +14,7 @@ This repository contains code to replicate the no-longer-available Toronto BookC
 Replicating the Toronto BookCorpus dataset consists of three parts:
 1. Getting the download URLs of the plaintext books (optional)
 2. Downloading the plaintext books
-3. Pre-processing the plaintext books (WIP)
+3. Pre-processing the plaintext books
 
 ### 1. Getting the download URLs of the plaintext books (optional)
 The first part is optional, as I have already provided a list of download URLS in `book_download_urls.txt` ready to use. Nonetheless, you can recreate this list as follows:
@@ -29,8 +30,11 @@ python src/download_books.py
 
 Please note that you have to execute the above command multiple times (29 times to be exact), from multiple IP-addresses, as [Smashwords](https://www.smashwords.com/) (temporarily) blocks any IP-address after 500 downloads. If you know of a way to automate this through python, please submit a pull request!
 
-### 3. Pre-processing the plaintext books (WIP)
-After downloading the plaintext books, they need to be pre-processed in order to be a true replica of the Toronto BookCorpus dataset. This part is still WIP for the moment and will follow soon.
+### 3. Pre-processing the plaintext books
+After downloading the plaintext books, they need to be pre-processed in order to be a true replica of the Toronto BookCorpus dataset (one sentence per line). This can be accomplished as follows:
+```python
+python src/preprocess_books.py
+```
 
 ### Acknowledgement
 This project builds upon [bookcorpus](https://github.com/soskek/bookcorpus).
