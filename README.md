@@ -31,7 +31,7 @@ python src/download_books.py
 Please note that you have to execute the above command multiple times (~30 times to be more precise), from multiple IP-addresses, as [Smashwords](https://www.smashwords.com/) (temporarily) blocks any IP-address after 500 downloads. If you know of a way to automate this through python, please submit a pull request!
 
 ### 3. Pre-processing the plaintext books
-After downloading the plaintext books, they need to be pre-processed in order to be a true replica of the Toronto BookCorpus dataset (one sentence per line). This can be accomplished as follows:
+After downloading the plaintext books, they need to be pre-processed in order to be a true replica of the Toronto BookCorpus dataset (sentence tokenized and one sentence per line). This can be accomplished as follows:
 ```python
 python src/preprocess_books.py
 ```
