@@ -47,13 +47,36 @@ def dump(obj: object, name: str, dump_dir: Path = Path(__file__).resolve().paren
         json.dump(obj, open(file, 'w'))
 
 
-def get(url: str, session: Session = None, headers: Dict[str, str] = None, cookies: Dict[str, str] = None, timeout: Dict = None) -> Response:
+import requests
+from lxml.html import fromstring
+
+
+def get_proxies():
+    url = 'https://free-proxy-list.net/'
+    response = requests.get(url)
+    parser = fromstring(response.text)
+    proxies = set()
+    for i in parser.xpath('//tbody/tr')[:10]:
+        if i.xpath('.//td[7][contains(text(),"yes")]'):
+            # Grabbing IP and corresponding PORT
+            proxy = ":".join([i.xpath('.//td[1]/text()')[0], i.xpath('.//td[2]/text()')[0]])
+            proxies.add(proxy)
+    return proxies
+
+
+def get(url: str, session: Session = None, headers: Dict[str, str] = None, proxy: str = None, cookies: Dict[str, str] = None,
+        timeout: Dict = None) -> Response:
     try:
+        if proxy is not None:
+            proxies = {"http": proxy, "https": proxy}
+        else:
+            proxies = None
+
         # make the request and get the response
         if session is None:
-            r = requests.get(url, headers=headers, cookies=cookies, timeout=timeout)
+            r = requests.get(url, headers=headers, cookies=cookies, timeout=timeout, proxies=proxies)
         else:
-            r = session.get(url, headers=headers, cookies=cookies, timeout=timeout)
+            r = session.get(url, headers=headers, cookies=cookies, timeout=timeout, proxies=proxies)
 
         # sleep
         if r.status_code != 200:
@@ -97,7 +120,7 @@ def mkdirs(*args: Path) -> None:
         dir.mkdir(parents=True, exist_ok=True)
 
 
-def read(file: Path, mode: str = 'rb', encoding: str = 'utf-8') -> str:
+def read(file: Path, mode: str = 'r', encoding: str = 'utf-8') -> str:
     # check if file exists
     if not file.exists():
         print(f'File does not exist: {file}')
@@ -126,8 +149,8 @@ def text2sentences(text: str) -> str:
         if line:
             stack.append(line)
         elif stack:  # empty line and non-empty stack
-                sentences += text_to_sentences(' '.join(stack).strip()).splitlines()
-                stack = []
+            sentences += text_to_sentences(' '.join(stack).strip()).splitlines()
+            stack = []
 
     return '\n'.join(sentences)
 
@@ -136,7 +159,7 @@ def write(text: str, file: Path, mode: str = 'wb', encoding: str = 'utf-8') -> N
     # check if file exists
     if file.exists():
         print(f'File already exists: {file}')
-    
+
     if 'b' in mode:
         with open(file, mode=mode) as f:
             f.write(text)
