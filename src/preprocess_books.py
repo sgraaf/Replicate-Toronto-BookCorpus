@@ -20,8 +20,9 @@ def main():
 
     with open('replica.txt', 'w', encoding='utf-8') as out_f:
         for book_file in tqdm(book_files, total=len(book_files), desc='Pre-processing books'):
-            book_bytes = read(book_file)
+            book_bytes = read(book_file, mode="rb")
             book_text = bytes2text(book_bytes)
+            # book_text = book_bytes
             book_sentences = text2sentences(book_text)
             out_f.write(book_sentences)
             out_f.write('\n\n\n')  # 3 empty lines between distinct books
