@@ -74,6 +74,8 @@ def get_headers(file: Path) -> List[Dict[str, str]]:
 
 
 def get_book_id(url: str) -> str:
+    if isinstance(url, bytes):
+        url = url.decode('utf-8')
     return url.split('/download/')[1].split('/')[0]
 
 
