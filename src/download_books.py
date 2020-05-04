@@ -9,7 +9,8 @@ from cachecontrol import CacheControl
 from requests import Session
 from tqdm import tqdm
 
-from utils import dump, get, get_book_id, get_headers, load, mkdirs, read, sanitize_file, write
+from utils import (dump, get, get_book_id, get_headers, get_free_proxies, load,
+                   mkdirs, read, sanitize_file, write)
 
 NB_RETRIES = 3
 
@@ -37,6 +38,9 @@ def main():
         # initialize cache-controlled session
         session = CacheControl(Session())
 
+        # get proxies
+        proxies = get_free_proxies(session=session, headers=headers[0])
+
         # get the books (concurrently)
         with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
             for nb_retry in count(1):
@@ -53,7 +57,17 @@ def main():
                 failed_book_download_urls = []
 
                 # get the book_responses
-                book_responses = list(tqdm(executor.map(get, book_download_urls, repeat(session), cycle(headers)), total=len(book_download_urls), desc='Getting books'))
+                book_responses = list(tqdm(
+                    executor.map(
+                        lambda url, session_, headers_, proxies_: get(url, session=session_, headers=headers_, proxies=proxies_),
+                        book_download_urls,
+                        repeat(session),
+                        cycle(headers),
+                        cycle(proxies)
+                    ),
+                    total=len(book_download_urls),
+                    desc='Getting books'
+                ))
 
                 # dump the book_responses
                 dump(book_responses, 'book_responses.pkl')

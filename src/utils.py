@@ -47,13 +47,32 @@ def dump(obj: object, name: str, dump_dir: Path = Path(__file__).resolve().paren
         json.dump(obj, open(file, 'w'))
 
 
-def get(url: str, session: Session = None, headers: Dict[str, str] = None, cookies: Dict[str, str] = None, timeout: Dict = None) -> Response:
+def get(
+    url: str,
+    session: Session = None,
+    headers: Dict[str, str] = None,
+    cookies: Dict[str, str] = None,
+    timeout: float = None,
+    proxies: Dict[str, str] = {}
+) -> Response:
     try:
         # make the request and get the response
         if session is None:
-            r = requests.get(url, headers=headers, cookies=cookies, timeout=timeout)
+            r = requests.get(
+                url,
+                headers=headers,
+                cookies=cookies,
+                timeout=timeout,
+                proxies=proxies
+            )
         else:
-            r = session.get(url, headers=headers, cookies=cookies, timeout=timeout)
+            r = session.get(
+                url,
+                headers=headers,
+                cookies=cookies,
+                timeout=timeout,
+                proxies=proxies
+            )
 
         # sleep
         if r.status_code != 200:
@@ -77,6 +96,35 @@ def get_book_id(url: str) -> str:
     if isinstance(url, bytes):
         url = url.decode('utf-8')
     return url.split('/download/')[1].split('/')[0]
+
+
+def get_free_proxies(
+    session: Session = None,
+    headers: Dict[str, str] = None,
+    cookies: Dict[str, str] = None
+) -> List[Dict[str, str]]:
+    url = 'https://free-proxy-list.net/'
+    response = get(
+        url,
+        session=session,
+        headers=headers,
+        cookies=cookies
+    )
+
+    if response:
+        proxies = []
+        tree = html.fromstring(response.content)
+        for row in tree.xpath('//table[@id="proxylisttable"]//tbody/tr'):
+            # check if the proxy supports https
+            if row.xpath('td[7][contains(text(), "yes")]'):
+                proxy = ':'.join([row.xpath('td[1]/text()')[0], row.xpath('td[2]/text()')[0]])
+                proxies.append(
+                    {
+                        'http': f'http://{proxy}',
+                        'https': f'https://{proxy}'
+                    }
+                )
+        return proxies
 
 
 def load(file: Path) -> object:
