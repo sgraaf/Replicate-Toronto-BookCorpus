@@ -108,15 +108,18 @@ def main():
                                 # get relevant data
                                 script_text = book_page_tree.xpath('//div[@id="contentArea"]/script/text()')[0]
                                 _json = json.loads(script_text.split('window.angularData.book = ')[1].split('};')[0] + '}')
-                                language = _json['language']['name']
+                                try:
+                                    language = _json['language']['name']
 
-                                if language == 'English':
-                                    formats = _json['formats']
+                                    if language == 'English':
+                                        formats = _json['formats']
 
-                                    if 'TXT' in formats:
-                                        f.write(book_page_tree.xpath('//a[@title="Plain text; contains no formatting"]/@href')[0] + '\n')
-                                    else:
-                                        continue
+                                        if 'TXT' in formats:
+                                            f.write(book_page_tree.xpath('//a[@title="Plain text; contains no formatting"]/@href')[0] + '\n')
+                                        else:
+                                            continue
+                                except KeyError:
+                                    continue
                             except IndexError:
                                 failed_book_page_urls.append(book_page_url)
                                 print(f'Request failed for {book_page_url}')
