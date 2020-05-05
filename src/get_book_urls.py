@@ -17,6 +17,8 @@ NB_RETRIES = 3
 
 
 def main():
+    #create base URL
+    base_url = 'https://www.smashwords.com'
     # create dirs
     root_dir = Path(__file__).resolve().parents[1]
     dump_dir = root_dir / 'dump'
@@ -115,7 +117,7 @@ def main():
                                         formats = _json['formats']
 
                                         if 'TXT' in formats:
-                                            f.write(book_page_tree.xpath('//a[@title="Plain text; contains no formatting"]/@href')[0] + '\n')
+                                            f.write(base_url + book_page_tree.xpath('//a[@title="Plain text; contains no formatting"]/@href')[0] + '\n')
                                         else:
                                             continue
                                 except KeyError:
