@@ -5,6 +5,7 @@ import pickle as pkl
 import re
 import time
 import unicodedata
+from ixml import html
 from pathlib import Path
 from typing import Dict, List
 
