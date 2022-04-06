@@ -1,0 +1,6 @@
+blingfire>=0.1.8
+CacheControl>=0.12.10
+chardet>=4.0.0
+lxml>=4.8.0
+requests>=2.27.1
+tqdm>=4.64.0
